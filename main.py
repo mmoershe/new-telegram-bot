@@ -15,7 +15,8 @@ async def startup(application: Application):
     prompt: str = '''
     Generate a very very short and brief message (maximum one sentence!) articulating that you have just woken up or just started working or are now in my service. The message should be in the style of fromsoftware games, such as Dark Soul 1, Dark Souls 2, Dark Souls 3, Bloodborne or Elden Ring, using the fantasy old english these games typical use. Just output the message as a plain string without any surrounding quotation marks or anything else. 
     '''
-    message: str = generate_response(prompt)
+    # message: str = generate_response(prompt)
+    message: str = "meddl!"
     await application.bot.send_message(chat_id=CHAT_ID, text=message)
 
 
@@ -38,8 +39,6 @@ async def regular_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TOKEN).post_init(startup).build()
-
-    # application.post_init(startup)
 
     application.add_handler(CommandHandler('status', status))
     application.add_handler(CommandHandler('yt', yt))
