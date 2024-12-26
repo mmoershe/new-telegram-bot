@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import ApplicationBuilder, filters, ContextTypes, CommandHandler, MessageHandler
+from telegram.ext import ApplicationBuilder, Application, filters, ContextTypes, CommandHandler, MessageHandler
 
 from modules.CONST import TOKEN, CHAT_ID
 from modules.ollama_llm import generate_response
@@ -11,8 +11,16 @@ logging.basicConfig(
 )
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=CHAT_ID, text="I'm a bot, please talk to me!")
+async def startup(application: Application): 
+    prompt: str = '''
+    Generate a short and brief message (maximum one sentence!) articulating that you have just woken up or just started working or are now in my service. The message should be in the style of fromsoftware games, such as Dark Soul 1, Dark Souls 2, Dark Souls 3, Bloodborne or Elden Ring, using the fantasy old english these games typical use. Just output the message as a plain string without any surrounding quotation marks or anything else. 
+    '''
+    message: str = generate_response(prompt)
+    await application.bot.send_message(chat_id=CHAT_ID, text=message)
+
+
+async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=CHAT_ID, text="bot running.")
 
 
 async def yt(update: Update, context: ContextTypes.DEFAULT_TYPE): 
@@ -29,13 +37,12 @@ async def regular_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(TOKEN).post_init(startup).build()
 
-    start_handler = CommandHandler('start', start)
-    application.add_handler(start_handler)
+    # application.post_init(startup)
 
-    youtube_handler = CommandHandler('yt', yt)
-    application.add_handler(youtube_handler)
+    application.add_handler(CommandHandler('status', status))
+    application.add_handler(CommandHandler('yt', yt))
 
     message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), regular_message)
     application.add_handler(message_handler)
